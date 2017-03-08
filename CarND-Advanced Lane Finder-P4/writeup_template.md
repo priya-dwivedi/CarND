@@ -58,44 +58,27 @@ I then used the output `objpoints` and `imgpoints` to compute the camera calibra
 I pickled the camera calibration coefficients mtx and dst (code line **3**) and used these in cv2.undistort (code line **5**) to remove distortion in the test images. See example below of a distortion corrected image
 <img src="./output_images/undist_test_image.png" width="600">
 
-To demonstrate this step, I will describe how I apply the distortion correction to one of the test images like this one:
-![alt text][image2]
-####2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
-I used a combination of color and gradient thresholds to generate a binary image (thresholding steps at lines # through # in `another_file.py`).  Here's an example of my output for this step.  (note: this is not actually from one of the test images)
+####3. Create a thresholded binary image
+I used a combination of color and gradient thresholds to generate a binary image (The code for doing various thresholding operations is in cell **5** and the parameters chosen for these functions are in code line **7**). I found that gradient thresholding using sobel operator in x-direction was the most effective. For color thresholding I used the s-channel to identify yellow and white lines better under different lightening conditions. Further I combined sobelx gradient thresholding and s- color thresholds to obtain the thresholded binary image. The parameters for these operators were chosen by trial and error. See below the result of these operations:
 
-![alt text][image3]
+<img src="./output_images/threshold_binary.png" width="600">
 
-####3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
+####4. Perspective transform
+After the thresholding operation, I performed perspective transform to change the image to bird's eye view. This is done because we can use this to identify the curvature of the lane and fit a polynomial to it. To perform the perspective transform, I identified 4 src points that form a trapezoid on the image and 4 dst points such that lane lines are parallel to each other after the transformation. The dst points were chosen by trial and error but once chosen works well for all images and the video since the camera is mounted in a fixed position. Finally I used the cv2.getPerspective to identify M and then cv2.warpPerspective to use the M matrix to warp an image. The code for warp function is in code cell **5** 
 
-The code for my perspective transform includes a function called `warper()`, which appears in lines 1 through 8 in the file `example.py` (output_images/examples/example.py) (or, for example, in the 3rd code cell of the IPython notebook).  The `warper()` function takes as inputs an image (`img`), as well as source (`src`) and destination (`dst`) points.  I chose the hardcode the source and destination points in the following manner:
-
-```
-src = np.float32(
-    [[(img_size[0] / 2) - 55, img_size[1] / 2 + 100],
-    [((img_size[0] / 6) - 10), img_size[1]],
-    [(img_size[0] * 5 / 6) + 60, img_size[1]],
-    [(img_size[0] / 2 + 55), img_size[1] / 2 + 100]])
-dst = np.float32(
-    [[(img_size[0] / 4), 0],
-    [(img_size[0] / 4), img_size[1]],
-    [(img_size[0] * 3 / 4), img_size[1]],
-    [(img_size[0] * 3 / 4), 0]])
-
-```
-This resulted in the following source and destination points:
+The following source and destination points were chosen:
 
 | Source        | Destination   | 
 |:-------------:|:-------------:| 
-| 585, 460      | 320, 0        | 
-| 203, 720      | 320, 720      |
-| 1127, 720     | 960, 720      |
-| 695, 460      | 960, 0        |
+| 800, 510      | 650, 470      | 
+| 1150, 700     | 640, 700      |
+| 270, 700      | 270, 700      |
+| 510, 510      | 270, 510      |
 
 I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto a test image and its warped counterpart to verify that the lines appear parallel in the warped image.
+<img src="./output_images/warped1.PMG" width="600">
 
-![alt text][image4]
-
-####4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
+####5.Identify lane-line pixels and fit their positions with a polynomial
 
 Then I did some other stuff and fit my lane lines with a 2nd order polynomial kinda like this:
 
