@@ -128,5 +128,22 @@ Here's a [link to my challenge video result](./test_challenge_video.mp4)
 
 ####1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
+Two problems that I faced were:
+1. The left lane was getting confused with lane seperator (between going and oncoming traffic) since the histogram was identifying both of them. To solve this I set the condition that histogram identify leftx_base b/w 150 pixels and midpoint of the image. The 150 pixels ensured that lane seperators were discarded. Similarly for the right lane I made sure histogram limited the search from midpoint to mipoint + 500 pixels so any noise was not identified
+
+2. np.polyfit sometimes resulted in curves that were a very bad fit. This was especially happening for the left lane in the challenge video. To address this, I introduced a condition in sanity check that left and rigth lane slopes are roughly parallel (delta in slope is less than 0.1). If this condition failed then, last good value of left and right lane fits were used. This was very useful in improving performance on the challenge video.
+
+My biggest concern with the approach here is that it relies heavily on tuning the parameters for thresholding/warping and those can be camera/track specific. I am afraid that this approach will not be able to generalize to a wide range of situations. And hence I am not very convinced that it can be used in practice for autonomously driving a car. This was apparent in the challenge video where parameters tuned for the project video resulted in an inferior performance on a different track in the challenge video.
+
+Here are a few situations where the pipeline might fail:
+1. Presence of snow/debris on the road that makes it difficult to clearly see lane lines
+2. Roads that are wavy or S shaped where a second order polynomial may not be able to properly fit lane lines
+
+A few things that can make the code more robust:
+1. Incorporate the ability to test a wide range of parameters (for thresholding and warping) so that the code can generalize to a wider range of track and weather conditions. To do this we need a very powerful sanity check function that can identify lane lines that are impractical and discard them
+2. 
+
+###References: For this project, I relied heavily on the code shared in the lectures and adjusted and tuned to work well for the problem at hand.
+
 Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
 
