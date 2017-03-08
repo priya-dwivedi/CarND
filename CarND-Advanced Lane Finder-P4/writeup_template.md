@@ -143,5 +143,5 @@ Here are a few  other situations where the pipeline might fail:
 To make the code more robust we should try to incorporate the ability to test a wide range of parameters (for thresholding and warping) so that the code can generalize to a wider range of track and weather conditions. To do this we need a very powerful sanity check function that can identify lane lines that are impractical and discard them
 
 
-###References: For this project, I relied heavily on the code shared in the lectures and adjusted and tuned to work well for the problem at hand.
+####References: For this project, I relied heavily on the code shared in the lectures and adjusted and tuned to work well for the problem at hand.
 
