@@ -21,10 +21,6 @@ The following files have been included in this submission
 * This write up file
 
 
-[//]: # (Image References)
-
-[video1]: ./project_video.mp4 "Video"
-
 ## [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points
 ###Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
 
@@ -38,11 +34,11 @@ You're reading it!
 
 ####1. Briefly state how you computed the camera matrix and distortion coefficients. Provide an example of a distortion corrected calibration image.
 
-The code for this step is contained in the code cell **2** of the IPython notebook located in " P4_advanced_lane_detection_final.ipynb" 
+The code for this step is contained in the code cell **2 and 3** of the IPython notebook located in " P4_advanced_lane_detection_final.ipynb" 
 
-I start by preparing "object points", which will be the (x, y, z) coordinates of the chessboard corners in the world. Here I am assuming the chessboard is fixed on the (x, y) plane at z=0, such that the object points are the same for each calibration image. This example has 9x6 chessboard corners. Thus, `objp` is just a replicated array of coordinates, and `objpoints` will be appended with a copy of it every time I successfully detect all chessboard corners in a test image.  `imgpoints` will be appended with the (x, y) pixel position of each of the corners in the image plane with each successful chessboard detection.  
+We start by preparing "object points", which will be the (x, y, z) coordinates of the chessboard corners in the world. Here I am assuming the chessboard is fixed on the (x, y) plane at z=0, such that the object points are the same for each calibration image. This example has 9x6 chessboard corners. Thus, `objp` is just a replicated array of coordinates, and `objpoints` will be appended with a copy of it every time we successfully detect all chessboard corners in a test image.  `imgpoints` will be appended with the (x, y) pixel position of each of the corners in the image plane with each successful chessboard detection.  
 
-I then used the output `objpoints` and `imgpoints` to compute the camera calibration and distortion coefficients using the `cv2.calibrateCamera()` function.  I applied this distortion correction to the test image using the `cv2.undistort()` function and obtained this result: 
+We can then use the output `objpoints` and `imgpoints` to compute the camera calibration and distortion coefficients using the `cv2.calibrateCamera()` function.  I applied this distortion correction to the test image using the `cv2.undistort()` function and obtained this result: 
 
 <img src="./output_images/orig_camera_img.png" width="600">
 
@@ -88,25 +84,43 @@ We will calculate the radius of curvature for left and right lanes at the bottom
 x = ay2 + by + c
 
 Taking derivatives, the formula is: radius = (1 + (2a y_eval+b)2)1.5 / abs(2a)
+
 Also we need to convert the radius of curvature from pixels to meter. This is done by using a pixel conversion factor for x and y directions. The calculation of radius of curvature and offset from center is in code cell **14**. A sanity check suggested in the lectures was to see if calculated radius of curvature ~ 1km for the track in project video.
 
 Calculation of offset to the center of lane.
 
-We assume the camera is mounted exactly in the center of the car. We first calculate the bottom of left and right lane and hence the center of the lane. The difference between the center of the image (1280 /2 = 640) and the center of the lanes is the offset (in pixels). The calculation was then cnverted to meters.
+We assume the camera is mounted exactly in the center of the car. We first calculate the bottom of left and right lane and hence the center of the lane. The difference between the center of the image (1280 /2 = 640) and the center of the lanes is the offset (in pixels). The calculation was then converted to meters.
 
 ####7.Plot result back down onto tho road such that the lane area is identified clearly.
 
-I implemented this step in lines # through # in my code in `yet_another_file.py` in the function `map_lane()`.  Here is an example of my result on a test image:
+Once we have lane lines identified and polynomial fit to them, we can again use cv2.warpPerspective and the Minv matrix to warp lane lines back onto original image. We also do a weightedadd to show the lane lines on the undistorted image. The code for draw lines function is in code cell **18** .  Here is an example of my result on a test image. I have used cv2.putText to display radius of curvature and offset from center on this image. The code for adding text to image is in code cell **17** :
 
 <img src="./output_images/perspective.png" width="600">
+
+####8.Sanity Check
+I also implemented a function to sanity check if the lane lines were being properly identified. This function did the following 3 checks:
+* Left and right lane lines were identified (By checking if np.polyfit returned values for left and right lanes)
+* If left and right lanes were identified, there average seperation is in the range 150-430 pixels
+* If left and right lanes were identified then there are parallel to each other (difference in slope <0.1)
+If an image fails any of the above checks then identified lane lines are discarded and last good left and right lane values are used.
+This function was particularly useful in the challenge video where it was difficult to properly identify lane lines.
+The code for sanity check is in code cell **21* :
 
 ---
 
 ###Pipeline (video)
+After creating all the required functions, I first tested a pipeline that combined all the functions on test images. Once I was satisfied with the results I created a process image pipeline code cell **22* for treating a sequence of images. I added the following checks to this pipeline:
+* If this is the first image then the lane lines are identified using a histogram search (checked using a counter variable)
+* Otherwise the previous left and right fit are used to narrow the search window and identify lane lines (function implemented in code cell **13**
+* The left and right fits identified were stored in a variable and if sanity check described above was failed, then the last good values of left and right fit were used
 
-####1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!).
+Finally moviepy editor was used to process the project video image by image through the pipeline. The result was pretty good. Lane lines were identified very well through the entire video. 
+Here is a link to the video
 
-Here's a [link to my video result](./project_video.mp4)
+Here's a [link to my project video result](./test_video.mp4)
+I also tested the pipeline on the challenge video and it performed well, not as good as the project video but decent. 
+Here's a [link to my challenge video result](./test_challenge_video.mp4)
+
 
 ---
 
