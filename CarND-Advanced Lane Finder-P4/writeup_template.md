@@ -94,11 +94,7 @@ Calculation of offset to the center of lane.
 
 We assume the camera is mounted exactly in the center of the car. We first calculate the bottom of left and right lane and hence the center of the lane. The difference between the center of the image (1280 /2 = 640) and the center of the lanes is the offset (in pixels). The calculation was then cnverted to meters.
 
-((xL(720) + xR(720))/2–1280/2 )* xm_per_pix
-
-I did this in lines # through # in my code in `my_other_file.py`
-
-####6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
+####7.Plot result back down onto tho road such that the lane area is identified clearly.
 
 I implemented this step in lines # through # in my code in `yet_another_file.py` in the function `map_lane()`.  Here is an example of my result on a test image:
 
