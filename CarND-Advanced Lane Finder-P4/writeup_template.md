@@ -23,12 +23,6 @@ The following files have been included in this submission
 
 [//]: # (Image References)
 
-[image1]: ./output_images/orig_camera_img.png "Undistorted Camera"
-[image2]: ./test_images/test1.jpg "Road Transformed"
-[image3]: ./examples/binary_combo_example.jpg "Binary Example"
-[image4]: ./examples/warped_straight_lines.jpg "Warp Example"
-[image5]: ./examples/color_fit_lines.jpg "Fit Visual"
-[image6]: ./examples/example_output.jpg "Output"
 [video1]: ./project_video.mp4 "Video"
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points
@@ -59,12 +53,12 @@ I pickled the camera calibration coefficients mtx and dst (code line **3**) and 
 <img src="./output_images/undist_test_image.png" width="600">
 
 ####3. Create a thresholded binary image
-I used a combination of color and gradient thresholds to generate a binary image (The code for doing various thresholding operations is in cell **5** and the parameters chosen for these functions are in code line **7**). I found that gradient thresholding using sobel operator in x-direction was the most effective. For color thresholding I used the s-channel to identify yellow and white lines better under different lightening conditions. Further I combined sobelx gradient thresholding and s- color thresholds to obtain the thresholded binary image. The parameters for these operators were chosen by trial and error. See below the result of these operations:
+I used a combination of color and gradient thresholds to generate a binary image (The code for doing various thresholding operations is in cell **5** and the parameters chosen for these functions are in code line **8**). I found that gradient thresholding using sobel operator in x-direction was the most effective. For color thresholding I used the s-channel to identify yellow and white lines better under different lightening conditions. Further I combined sobelx gradient thresholding and s- color thresholds to obtain the thresholded binary image. The parameters for these operators were chosen by trial and error. See below the result of these operations:
 
 <img src="./output_images/threshold_binary.png" width="600">
 
 ####4. Perspective transform
-After the thresholding operation, I performed perspective transform to change the image to bird's eye view. This is done because we can use this to identify the curvature of the lane and fit a polynomial to it. To perform the perspective transform, I identified 4 src points that form a trapezoid on the image and 4 dst points such that lane lines are parallel to each other after the transformation. The dst points were chosen by trial and error but once chosen works well for all images and the video since the camera is mounted in a fixed position. Finally I used the cv2.getPerspective to identify M and then cv2.warpPerspective to use the M matrix to warp an image. The code for warp function is in code cell **5** 
+After the thresholding operation, we perform the perspective transform to change the image to bird's eye view. This is done because we can use this to identify the curvature of the lane and fit a polynomial to it. To perform the perspective transform, I identified 4 src points that form a trapezoid on the image and 4 dst points such that lane lines are parallel to each other after the transformation. The dst points were chosen by trial and error but once chosen works well for all images and the video since the camera is mounted in a fixed position. Finally I used the cv2.getPerspective to identify M and then cv2.warpPerspective to use the M matrix to warp an image. The code for warp function is in code cell **5** 
 
 The following source and destination points were chosen:
 
@@ -76,15 +70,31 @@ The following source and destination points were chosen:
 | 510, 510      | 270, 510      |
 
 I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto a test image and its warped counterpart to verify that the lines appear parallel in the warped image.
-<img src="./output_images/warped1.PMG" width="600">
+<img src="./output_images/warped1.PNG" width="600">
 
 ####5.Identify lane-line pixels and fit their positions with a polynomial
 
-Then I did some other stuff and fit my lane lines with a 2nd order polynomial kinda like this:
+In order to better estimate where the lane is, we use a histogram of the bottom half of image to identify potential left and right lane markings.I modified this function to narrow down the area in which left and right lanes can exist so that highway lane seperators or any other noise doesn't get identified as a lane. Once the initial left and right lane bottom points are identified, we divide the image in windows, and for each left and right window we find the mean of it, re-centering the window. We then feed the numpy polyfit function to find the best second order polynomial to represent the lanes, as in image below. The code for the fitlines function is in code cell **12** 
 
-![alt text][image5]
+<img src="./output_images/fit_lines.png" width="600">
 
-####5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
+####6. Calculate the radius of curvature of the lane and the position of the vehicle with respect to the center
+The radius of curvature is given by following formula.
+
+Radius of curvature=​​ (1 + (dy/dx)2)1.5 / abs(d2y /dx2)
+
+We will calculate the radius of curvature for left and right lanes at the bottom of image.
+
+x = ay2 + by + c
+
+Taking derivatives, the formula is: radius = (1 + (2a y_eval+b)2)1.5 / abs(2a)
+Also we need to convert the radius of curvature from pixels to meter. This is done by using a pixel conversion factor for x and y directions. The calculation of radius of curvature and offset from center is in code cell **14**. A sanity check suggested in the lectures was to see if calculated radius of curvature ~ 1km for the track in project video.
+
+Calculation of offset to the center of lane.
+
+We assume the camera is mounted exactly in the center of the car. We first calculate the bottom of left and right lane and hence the center of the lane. The difference between the center of the image (1280 /2 = 640) and the center of the lanes is the offset (in pixels). The calculation was then cnverted to meters.
+
+((xL(720) + xR(720))/2–1280/2 )* xm_per_pix
 
 I did this in lines # through # in my code in `my_other_file.py`
 
