@@ -98,7 +98,7 @@ We assume the camera is mounted exactly in the center of the car. We first calcu
 
 I implemented this step in lines # through # in my code in `yet_another_file.py` in the function `map_lane()`.  Here is an example of my result on a test image:
 
-![alt text][image6]
+<img src="./output_images/perspective.png" width="600">
 
 ---
 
