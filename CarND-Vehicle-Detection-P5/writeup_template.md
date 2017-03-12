@@ -42,13 +42,13 @@ The dataset used contained 2826 cars and 8968 not car images. This dataset is un
 
 I started by exploring the color features - spatial binning and color histogram. For spatial binning, I reduced the image size to 16,16 and the plot below shows the difference in spatial binning features between car and notcar images for channel - RGB. The plot delta shows the difference b/w car and notcar features
 
-<img src="./output_images/binning_RGB.PNG" width="600">
+<img src="./output_images/binning_RGB.PNG" width="200">
 The code for this step is contained in the code cell **3 and 6** of the IPython notebook. In the end I decided to not use color features (histogram and spatial binning) as it adversely affected performance.
 
 Next I looked at HOG features using skimage.hog() functions. The key parameters are 'orientations', 'pixels_per_cell' and 'cells_per_block'. The num of orientations is the number of gradient directions. The pixels_per_cell parameter specifies the cell size over which each gradient histogram is computed. The cells_per_block parameter specifies the local area over which the histogram counts in a given cell will be normalized. To get a feel for the affect of  pixels_per_cell and cells_per_block, I looked at hog images with different settings. All the images below are from gray scale. The code for this step is contained in the code cell **4** of the IPython notebook.
-<img src="./output_images/hog1.PNG" width="600">
-<img src="./output_images/hog2.PNG" width="600">
-<img src="./output_images/hog3.PNG" width="600">
+<img src="./output_images/hog1.PNG" width="400">
+<img src="./output_images/hog2.PNG" width="400">
+<img src="./output_images/hog3.PNG" width="400">
 
 ####2. Explain how you settled on your final choice of HOG parameters.
 
