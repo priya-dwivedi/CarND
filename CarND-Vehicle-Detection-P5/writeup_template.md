@@ -46,8 +46,11 @@ I started by exploring the color features - spatial binning and color histogram.
 The code for this step is contained in the code cell **3 and 6** of the IPython notebook. In the end I decided to not use color features (histogram and spatial binning) as it adversely affected performance.
 
 Next I looked at HOG features using skimage.hog() functions. The key parameters are 'orientations', 'pixels_per_cell' and 'cells_per_block'. The num of orientations is the number of gradient directions. The pixels_per_cell parameter specifies the cell size over which each gradient histogram is computed. The cells_per_block parameter specifies the local area over which the histogram counts in a given cell will be normalized. To get a feel for the affect of  pixels_per_cell and cells_per_block, I looked at hog images with different settings. All the images below are from gray scale. The code for this step is contained in the code cell **4** of the IPython notebook.
+
 <img src="./output_images/hog1.PNG" width="400">
+
 <img src="./output_images/hog2.PNG" width="400">
+
 <img src="./output_images/hog3.PNG" width="400">
 
 ####2. Explain how you settled on your final choice of HOG parameters.
@@ -79,24 +82,33 @@ To implement sliding windows, I narrowed the search area to lower half of the im
 
 <img src="./output_images/multisize_windows.png" width="400">
 
+In the sliding window technique, for each window we extract features for that window, scale extracted features to be fed to the classifier, predict whether the window contains a car using our trained Linear SVM classifier and save the window if the classifier predicts there is a car in that window.
+
 For the final model I chose 2 window sizes - [(96,96), (128,128)] and correspoding y_start_stop of [[390, 650], [390, None]]. I found that the performance was improved with x_start_stop=[700, None] to reduce the search area to the right side lanes. I chose an overlap of 0.7
+
+The code for this step is in cell **11-13** of the IPython notebook.
 
 ####2. Show some examples of test images to demonstrate how your pipeline is working.  What did you do to optimize the performance of your classifier?
 
-Ultimately I searched on two scales using YCrCb 3-channel HOG features plus spatially binned color and histograms of color in the feature vector, which provided a nice result.  Here are some example images:
+Here are some examples of test images from my classifier. As you can see there are multiple detections and false positives. To smoothen out multiple detections and to remove false positives, I used the technique for generating heatmaps that was suggested in the lectures. 
 
-![alt text][image4]
----
+<img src="./output_images/heatmap_car.PNG" width="400">
+
+<img src="./output_images/heatmap_nocar.PNG" width="400">
+
+The code for this step is in cell **14** of the IPython notebook.
 
 ### Video Implementation
 
-####1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (somewhat wobbly or unstable bounding boxes are ok as long as you are identifying the vehicles most of the time with minimal false positives.)
-Here's a [link to my video result](./project_video.mp4)
+####1. Vehicle Detection Video ouput
+Here's a [link to my vehicle detection result](./vehicle_detection.mp4)
 
+I also modified the pipeline to perform both lane (from P4 Advanced Lane Detection) and vehicle detection.
+Here's a [link to my lane and vehicle detection result](./lane_and_vehicle_ouput.mp4)
 
 ####2. Describe how (and identify where in your code) you implemented some kind of filter for false positives and some method for combining overlapping bounding boxes.
 
-I recorded the positions of positive detections in each frame of the video.  From the positive detections I created a heatmap and then thresholded that map to identify vehicle positions.  I then used `scipy.ndimage.measurements.label()` to identify individual blobs in the heatmap.  I then assumed each blob corresponded to a vehicle.  I constructed bounding boxes to cover the area of each blob detected.  
+I recorded the positions of positive detections in each frame of the video. I combined detection over 20 frames. From the positive detections I created a heatmap and then thresholded that map to identify vehicle positions.  I then used `scipy.ndimage.measurements.label()` to identify individual blobs in the heatmap.  I then assumed each blob corresponded to a vehicle.  I constructed bounding boxes to cover the area of each blob detected.  
 
 Here's an example result showing the heatmap from a series of frames of video, the result of `scipy.ndimage.measurements.label()` and the bounding boxes then overlaid on the last frame of video:
 
@@ -118,5 +130,22 @@ Here's an example result showing the heatmap from a series of frames of video, t
 
 ####1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
+Two problems that I faced were:
+
+1. I found that the test accuracy in the classifier was not a good predictor of actual performance in the video. Most model combinations had an accuracy of 97%+ but only a few had good performance in the video. This was a bit surprising. I think this is because I didn't put in extra work in making sure that examples in training and testing were distinct. As a result the model overfit to the training data. To identify the best model, I tested performance in the video. 
+
+2. Once the video pipeline was working, it was detection false positives in some frames and not detecting the car in other frames. Careful tuning of num of frames over which windows are added and thresholding parameter were needed. Ideally there should be a way of modifying these parameters for different sections of the video.
+
+My biggest concern with the approach here is that it relies heavily on tuning the parameters for window size, scale, hog parameters, threshold etc. and those can be camera/track specific. I am afraid that this approach will not be able to generalize to a wide range of situations. And hence I am not very convinced that it can be used in practice for autonomously driving a car. 
+
+Here are a few  other situations where the pipeline might fail:
+1. I am not sure this model would perform well when it is a heavy traffic situations and there are multiple vehicles. 
+2. Roads that are wavy or S shaped where a second order polynomial may not be able to properly fit lane lines
+
+To make the code more robust we can should try the following:
+1. Reduce the effect of time series in training test split so that the model doesn't overfit to training data
+2. Instead of searching for cars in each image independently, we can try and record their last position and search in a specific x,y range only
+3. Modify HOG to extract features for the entire image only once.
+
+####References: For this project, I relied heavily on the code shared in the lectures and adjusted and tuned to work well for the problem at hand. 
 
