@@ -36,13 +36,13 @@ You're reading it!
 ####1. Explain how (and identify where in your code) you extracted HOG features from the training images.
 
 I started by reading in all the `vehicle` and `non-vehicle` images.  Here is an example of one of each of the `vehicle` and `non-vehicle` classes:
-<img src="./output_images/carandnotcar.PNG" width="600">
+<img src="./output_images/carandnotcar.PNG" width="400">
 
 The dataset used contained 2826 cars and 8968 not car images. This dataset is unbalanced. I decided to leave it unbalanced since in the project video not car images far exceed the car images. The code for this step is contained in the code cell **2** of the IPython notebook.
 
 I started by exploring the color features - spatial binning and color histogram. For spatial binning, I reduced the image size to 16,16 and the plot below shows the difference in spatial binning features between car and notcar images for channel - RGB. The plot delta shows the difference b/w car and notcar features
 
-<img src="./output_images/binning_RGB.PNG" width="200">
+<img src="./output_images/binning_RGB.PNG" width="400">
 The code for this step is contained in the code cell **3 and 6** of the IPython notebook. In the end I decided to not use color features (histogram and spatial binning) as it adversely affected performance.
 
 Next I looked at HOG features using skimage.hog() functions. The key parameters are 'orientations', 'pixels_per_cell' and 'cells_per_block'. The num of orientations is the number of gradient directions. The pixels_per_cell parameter specifies the cell size over which each gradient histogram is computed. The cells_per_block parameter specifies the local area over which the histogram counts in a given cell will be normalized. To get a feel for the affect of  pixels_per_cell and cells_per_block, I looked at hog images with different settings. All the images below are from gray scale. The code for this step is contained in the code cell **4** of the IPython notebook.
@@ -55,7 +55,7 @@ Next I looked at HOG features using skimage.hog() functions. The key parameters 
 I tried various combinations of parameters and finally settled on the choice:
 color_space = 'YCrCb' - YCrCb resulted in far better performance than RGB, HSV and HLS
 orient = 9  # HOG orientations - I tried 6,9 and 12. Model performance didn't vary much
-pix_per_cell = 8 - I tried 8 and 16 and finally chose 8
+pix_per_cell = 16 - I tried 8 and 16 and finally chose 16 since it signficantly decreased computation time
 cell_per_block = 1 - I tried 1 and 2. The performance difference b/w the 2 wasn't much but 1 cell per block had significantly less no. of features and speeded up training and pipeline
 hog_channel = 'ALL' -  ALL resulted in far better performance than any other individual channel
 
@@ -77,7 +77,7 @@ The code for this step is in cell **10** of the IPython notebook.
 
 To implement sliding windows, I narrowed the search area to lower half of the image and searched with different window sizes. Small windows were limited to band 400 pixels to 650 pixels since small cars are more likely to occur farther on the horizon. Below is an example of searching with windows of different sizes.
 
-<img src="./output_images/multisize_windows.PNG" width="600">
+<img src="./output_images/multisize_windows.png" width="400">
 
 For the final model I chose 2 window sizes - [(96,96), (128,128)] and correspoding y_start_stop of [[390, 650], [390, None]]. I found that the performance was improved with x_start_stop=[700, None] to reduce the search area to the right side lanes. I chose an overlap of 0.7
 
