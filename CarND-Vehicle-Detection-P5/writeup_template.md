@@ -117,7 +117,7 @@ The code for this is in the vehicle detection pipeline is in cell **15 and 16**
 
 Here's an example result showing the heatmap from the last 20 frames of video,  the result of `scipy.ndimage.measurements.label()` on the heatmap and the bounding boxes then overlaid on the last frame of video:
 
-<img src="./output_images/final_heatmap.PNG" width="500">
+<img src="./output_images/final_heatmap.PNG" width="600">
 
 <img src="./output_images/final_boxes.png" width="400">
 ---
@@ -135,12 +135,16 @@ Two problems that I faced were:
 My biggest concern with the approach here is that it relies heavily on tuning the parameters for window size, scale, hog parameters, threshold etc. and those can be camera/track specific. I am afraid that this approach will not be able to generalize to a wide range of situations. And hence I am not very convinced that it can be used in practice for autonomously driving a car. 
 
 Here are a few  other situations where the pipeline might fail:
+
 1. I am not sure this model would perform well when it is a heavy traffic situations and there are multiple vehicles. You need something with near perfect accuracy to avoid bumping into other cars or to ensure there are no crashes on a crossing. 
+
 2. The model was slow to run. It took 6-7 minutes to process 1 minute of video. I am not sure this model would work in a real life situation with cars and pedestrians on thr road. 
 
 To make the code more robust we can should try the following:
 1. Reduce the effect of time series in training test split so that the model doesn't overfit to training data
+
 2. Instead of searching for cars in each image independently, we can try and record their last position and search in a specific x,y range only
+
 3. Modify HOG to extract features for the entire image only once.
 
 ####References: For this project, I relied heavily on the code shared in the lectures and adjusted and tuned to work well for the problem at hand. 
