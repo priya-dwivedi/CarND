@@ -80,7 +80,7 @@ The code for this step is in cell **10** of the IPython notebook.
 
 To implement sliding windows, I narrowed the search area to lower half of the image and searched with different window sizes. Small windows were limited to band 400 pixels to 650 pixels since small cars are more likely to occur farther on the horizon. Below is an example of searching with windows of different sizes.
 
-<img src="./output_images/multisize_windows.png" width="400">
+<img src="./output_images/multisize_windows.png" width="300">
 
 In the sliding window technique, for each window we extract features for that window, scale extracted features to be fed to the classifier, predict whether the window contains a car using our trained Linear SVM classifier and save the window if the classifier predicts there is a car in that window.
 
@@ -92,9 +92,9 @@ The code for this step is in cell **11-13** of the IPython notebook.
 
 Here are some examples of test images from my classifier. As you can see there are multiple detections and false positives. To smoothen out multiple detections and to remove false positives, I used the technique for generating heatmaps that was suggested in the lectures. 
 
-<img src="./output_images/heatmap_car.PNG" width="400">
+<img src="./output_images/heatmap_car.PNG" width="500">
 
-<img src="./output_images/heatmap_nocar.PNG" width="400">
+<img src="./output_images/heatmap_nocar.PNG" width="500">
 
 The code for this step is in cell **14** of the IPython notebook.
 
@@ -106,24 +106,15 @@ Here's a [link to my vehicle detection result](./vehicle_detection.mp4)
 I also modified the pipeline to perform both lane (from P4 Advanced Lane Detection) and vehicle detection.
 Here's a [link to my lane and vehicle detection result](./lane_and_vehicle_ouput.mp4)
 
+The code for vehicle detection pipeline is in cell **14** of the IPython notebook. Cells **** implement the lane detection pipeline and finally the two pipelines are combined in cell 
+
 ####2. Describe how (and identify where in your code) you implemented some kind of filter for false positives and some method for combining overlapping bounding boxes.
 
-I recorded the positions of positive detections in each frame of the video. I combined detection over 20 frames. From the positive detections I created a heatmap and then thresholded that map to identify vehicle positions.  I then used `scipy.ndimage.measurements.label()` to identify individual blobs in the heatmap.  I then assumed each blob corresponded to a vehicle.  I constructed bounding boxes to cover the area of each blob detected.  
+I recorded the positions of positive detections in each frame of the video. I combined detection over 20 frames (or using the number of frames available if there have been fewer than 20 frames before the current frame). From the positive detections I created a heatmap and then thresholded that map to identify vehicle positions. I found best performance with threshold parameter of 22.  I then used `scipy.ndimage.measurements.label()` to identify individual blobs in the heatmap.  I then assumed each blob corresponded to a vehicle.  I constructed bounding boxes to cover the area of each blob detected.  
 
-Here's an example result showing the heatmap from a series of frames of video, the result of `scipy.ndimage.measurements.label()` and the bounding boxes then overlaid on the last frame of video:
+Here's an example result showing the heatmap from the last 20 frames of video,  the result of `scipy.ndimage.measurements.label()` on the heatmap and the bounding boxes then overlaid on the last frame of video:
 
-### Here are six frames and their corresponding heatmaps:
-
-![alt text][image5]
-
-### Here is the output of `scipy.ndimage.measurements.label()` on the integrated heatmap from all six frames:
-![alt text][image6]
-
-### Here the resulting bounding boxes are drawn onto the last frame in the series:
-![alt text][image7]
-
-
-
+<img src="./output_images/final_heatmap.PNG" width="500">
 ---
 
 ###Discussion
@@ -139,8 +130,8 @@ Two problems that I faced were:
 My biggest concern with the approach here is that it relies heavily on tuning the parameters for window size, scale, hog parameters, threshold etc. and those can be camera/track specific. I am afraid that this approach will not be able to generalize to a wide range of situations. And hence I am not very convinced that it can be used in practice for autonomously driving a car. 
 
 Here are a few  other situations where the pipeline might fail:
-1. I am not sure this model would perform well when it is a heavy traffic situations and there are multiple vehicles. 
-2. Roads that are wavy or S shaped where a second order polynomial may not be able to properly fit lane lines
+1. I am not sure this model would perform well when it is a heavy traffic situations and there are multiple vehicles. You need something with near perfect accuracy to avoid bumping into other cars or to ensure there are no crashes on a crossing. 
+2. The model was slow to run. It took 6-7 minutes to process 1 minute of video. I am not sure this model would work in a real life situation with cars and pedestrians on thr road. 
 
 To make the code more robust we can should try the following:
 1. Reduce the effect of time series in training test split so that the model doesn't overfit to training data
