@@ -141,6 +141,7 @@ Here are a few  other situations where the pipeline might fail:
 2. The model was slow to run. It took 6-7 minutes to process 1 minute of video. I am not sure this model would work in a real life situation with cars and pedestrians on thr road. 
 
 To make the code more robust we can should try the following:
+
 1. Reduce the effect of time series in training test split so that the model doesn't overfit to training data
 
 2. Instead of searching for cars in each image independently, we can try and record their last position and search in a specific x,y range only
