@@ -57,11 +57,11 @@ Next I looked at HOG features using skimage.hog() functions. The key parameters 
 ####2. Explain how you settled on your final choice of HOG parameters.
 
 I tried various combinations of parameters and finally settled on the choice:
-color_space = 'YCrCb' - YCrCb resulted in far better performance than RGB, HSV and HLS
-orient = 9  # HOG orientations - I tried 6,9 and 12. Model performance didn't vary much
-pix_per_cell = 16 - I tried 8 and 16 and finally chose 16 since it signficantly decreased computation time
-cell_per_block = 1 - I tried 1 and 2. The performance difference b/w them wasn't much but 1 cell per block had significantly less no. of features and speeded up training and pipeline
-hog_channel = 'ALL' -  ALL resulted in far better performance than any other individual channel
+* color_space = 'YCrCb' - YCrCb resulted in far better performance than RGB, HSV and HLS
+* orient = 9  # HOG orientations - I tried 6,9 and 12. Model performance didn't vary much
+* pix_per_cell = 16 - I tried 8 and 16 and finally chose 16 since it signficantly decreased computation time
+* cell_per_block = 1 - I tried 1 and 2. The performance difference b/w them wasn't much but 1 cell per block had significantly less no. of features and speeded up training and pipeline
+* hog_channel = 'ALL' -  ALL resulted in far better performance than any other individual channel
 
 I spent a lot of time narrowing down on these parameters. In the beginning I relied on the test accuracy in SVM classifier to choose parameters but then found that most combinations had very high accuracy (b/w 96% and 98%) and this wasn't indicative of performance in the video. So these parameters were chosen after painstakingly trying and observing performance in the video. The code for this step is contained in the code cell **9 and 10** of the IPython notebook.
 
