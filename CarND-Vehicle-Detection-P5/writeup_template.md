@@ -43,7 +43,7 @@ The dataset used contained 2826 cars and 8968 not car images. This dataset is un
 
 I started by exploring the color features - spatial binning and color histogram. For spatial binning, I reduced the image size to 16,16 and the plot below shows the difference in spatial binning features between car and notcar images for channel - RGB. The plot delta shows the difference b/w car and notcar features
 
-<img src="./output_images/binning_RGB.PNG" width="600">
+<img src="./output_images/binning_RGB.PNG" width="450">
 
 The code for this step is contained in the code cell **3 and 6** of the IPython notebook. In the end I decided to not use color features (histogram and spatial binning) as it adversely affected performance.
 
@@ -82,7 +82,7 @@ The code for this step is in cell **10** of the IPython notebook.
 
 To implement sliding windows, I narrowed the search area to lower half of the image and searched with different window sizes. Small windows were limited to band 400 pixels to 650 pixels since small cars are more likely to occur farther on the horizon. Below is an example of searching with windows of different sizes.
 
-<img src="./output_images/multisize_windows.png" width="300">
+<img src="./output_images/multisize_windows.png" width="400">
 
 In the sliding window technique, for each window we extract features for that window, scale extracted features to be fed to the classifier, predict whether the window contains a car using our trained Linear SVM classifier and save the window if the classifier predicts there is a car in that window.
 
@@ -94,9 +94,9 @@ The code for this step is in cell **11-13** of the IPython notebook.
 
 Here are some examples of test images from my classifier. As you can see there are multiple detections and false positives. To smoothen out multiple detections and to remove false positives, I used the technique for generating heatmaps that was suggested in the lectures and set a threshold of 2. 
 
-<img src="./output_images/heatmap_car.PNG" width="500">
+<img src="./output_images/heatmap_car.PNG" width="400">
 
-<img src="./output_images/heatmap_nocar.PNG" width="500">
+<img src="./output_images/heatmap_nocar.PNG" width="400">
 
 The code for this step is in cell **14** of the IPython notebook.
 
