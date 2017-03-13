@@ -105,7 +105,7 @@ The code for this step is in cell **14** of the IPython notebook.
 Here's a [link to my vehicle detection result](./vehicle_detection.mp4)
 
 I also modified the pipeline to perform both lane (from P4 Advanced Lane Detection) and vehicle detection.
-Here's a [link to my lane and vehicle detection result](./lane_and_vehicle_ouput.mp4)
+Here's a [link to my lane and vehicle detection result](./lane_and_vehicle_output.mp4)
 
 The code for vehicle detection pipeline is in cell **15 and 16** of the IPython notebook. Cells **20-25** implement the lane detection pipeline and finally the two pipelines are combined in cell **26**
 
