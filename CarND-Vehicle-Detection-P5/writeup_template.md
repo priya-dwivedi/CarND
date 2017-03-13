@@ -93,9 +93,9 @@ The code for this step is in cell **11-13** of the IPython notebook.
 
 Here are some examples of test images from my classifier. As you can see there are multiple detections and false positives. To smoothen out multiple detections and to remove false positives, I used the technique for generating heatmaps that was suggested in the lectures and set a threshold of 2. 
 
-<img src="./output_images/heatmap_car.PNG" width="500">
+<img src="./output_images/heatmap_car.PNG" width="600">
 
-<img src="./output_images/heatmap_nocar.PNG" width="500">
+<img src="./output_images/heatmap_nocar.PNG" width="600">
 
 The code for this step is in cell **14** of the IPython notebook.
 
