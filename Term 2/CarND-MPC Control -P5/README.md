@@ -31,6 +31,7 @@ As suggested in the lectures, the error included several components:
       fg[0] += cost_eps* CppAD::pow(vars[epsi_start + i] - ref_epsi, 2);
       fg[0] += cost_v* CppAD::pow(vars[v_start + i] - ref_v, 2);
     }
+
 Above the error varies by deviation from reference CTE (set to zero), reference epsi (set to zero) and ref velocity (set to 40). N is the no. of timesteps we are forecasting into the future. The errors were all multiplied by factors (cost_cte, cost_eps etc) which were very important for smooth driving in the simulator and these multipliers were tuned by trying various values
 
 The error also varied by the actuator values and the change in actuator from previous time step. This ensures smooth changes in actuator values. Again the multipliers associated with them were tuned by looking at performance in the simulator. 
@@ -47,6 +48,18 @@ for (int i = 0; i < N - 1; i++) {
   
     }
 The full code is in MPC.cpp lines 65 -87. 
+
+### 2. Timestep Length and Frequency
+
+* Frequency (dt) - Is the time gap between different time steps. I found dt to be a very important parameter for the overall performance in the simulator. If dt was too low, it led to the car oscillating to and fro around the center of the track. This happens probably because the actuator input is received very quickly and the vehicle is constantly responding. Also if dt is smaller than the latency (0.1 s) then the new actuator signal is received before the previous one has been executed. This leads to jerky motion of the car. On the other hand if dt is too large, the car covers too much distance before the actuator is received and while this leads to smooth performance along the straight portions of the track, it can lead to car going off the road on the curves. 
+
+* Timestep length (N) - Is the number of timesteps the model predicts ahead. As N increases, the model predicts further ahead. The further ahead that the model predicts, the more inaccurate those predictions will be. Also if N is large, then a lot more computations need to happen which can lead to inaccurate results from the solver or solver unable to provide the solution in real time. I found that N around 10-15 steps was the best.
+
+Tuning of N and dt
+* dt - I tried dt values of 0.10, 0.12, 0.15 and 0.20. I found at 0.10 or below the car oscillated around the center of the track. And at 0.20 while the motion was smooth, the car rolled off the edge of the track around the curve. The best performance was at dt = 0.12.
+* N - Once dt was locked, I tried very high N - 30 and motion of the car was very jerky. The car was not very sensitive to N as long as it was in the range between 10 and 15. I finally chosen N =12.
+
+
 
 ## Dependencies
 
