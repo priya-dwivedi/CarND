@@ -7,7 +7,7 @@ Self-Driving Car Engineer Nanodegree Program
 ### 1. The Model
 
 **State**
-The MPC model defines state in terms of x , y positions, ψ - orientation of the car and v- velocity of the car, cte - the cross track error and epsi - the orientation error. The variables x, y, ψ and v are received from the simulator. The x, y position are in the map coordinates and are converted into the vehicle coordinate system. The vehicle space is used for fitting polynomials and path planning for the car. 
+The MPC model defines state in terms of x , y positions, ψ - orientation of the car and v- velocity of the car, cte - the cross track error and epsi - the orientation error. The variables x, y, ψ and v are received from the simulator. The x, y position are in the map coordinates and are converted into the vehicle coordinate system. 
 
 **Actuators**
 There are two actuators here: δ - steering angle and a- throttle (which also includes negative acceleration - braking). These are obtained from the result of the solver and passed to the simulator (in main.cpp lines 141-146)
@@ -49,34 +49,29 @@ for (int i = 0; i < N - 1; i++) {
     }
 The full code is in MPC.cpp lines 65 -87. 
 
-MPC Setup:
+**MPC Setup**
+As described in the lectures, the following are the steps for executing MPC
 
-    Define the length of the trajectory, N, and duration of each timestep, dt.
+1. Define the length of the trajectory, N, and duration of each timestep, dt.
         See below for definitions of N, dt, and discussion on parameter tuning.
 
-    Define vehicle dynamics and actuator limitations along with other constraints.
+2. Fit polynomial to way points and use that to set the intial cross track error and orientation error
+3. Define vehicle dynamics and actuator limitations along with other constraints.
         See the state, actuators and update equations above.
-    Define the cost function.
-        Cost in this MPC increases with: (see MPC.cpp lines 80-101)
-            Difference from reference state (cross-track error, orientation and velocity)
-            Use of actuators (steering angle and acceleration)
-            Value gap between sequential actuators (change in steering angle and change in acceleration).
-        We take the deviations and square them to penalise over and under-shooting equally.
-            This may not be optimal.
-        Each factor mentioned above contributed to the cost in different proportions. We did this by multiplying the squared deviations by weights unique to each factor.
+4. Define the cost function.
+        Explained above
 
-MPC Loop:
+Once all the model is set and all the parameters are defined, 
+    1. We pass the current state as the initial state to the model predictive controller.
 
-    We pass the current state as the initial state to the model predictive controller.
-
-    We call the optimization solver. Given the initial state, the solver will *return the vector of control inputs that minimizes the cost function. The solver we'll use is called Ipopt.
-    We apply the first control input to the vehicle.
-    Back to 1.
+    2. We call the optimization solver. Given the initial state, the solver will return the vector of control inputs that minimizes the cost function. The solver we'll use is called Ipopt.
+    3. We apply the first control input to the vehicle.
+    and  Back to 1.
 
 
 ### 2. Timestep Length and Frequency
 
-* Frequency (dt) - Is the time gap between different time steps. I found dt to be a very important parameter for the overall performance in the simulator. If dt was too low, it led to the car oscillating to and fro around the center of the track. This happens probably because the actuator input is received very quickly and the vehicle is constantly responding. Also if dt is smaller than the latency (0.1 s) then the new actuator signal is received before the previous one has been executed. This leads to jerky motion of the car. On the other hand if dt is too large, the car covers too much distance before the actuator is received and while this leads to smooth performance along the straight portions of the track, it can lead to car going off the road on the curves. 
+* Frequency (dt) - Is the time gap between different time steps. I found dt to be a very important parameter for the overall performance in the simulator. If dt was too low, it led to the car oscillating to and fro around the center of the track. This happens probably because the actuator input is received very quickly and the vehicle is constantly responding. Also if dt is smaller than the latency (0.1 s) then the new actuator signal is received before the previous one has been executed. This leads to jerky motion of the car. On the other hand if dt is too large, the car covers too much distance before the actuator is received and while this leads to smooth performance along the straight portions of the track, it leads to car going off the road on the curves. 
 
 * Timestep length (N) - Is the number of timesteps the model predicts ahead. As N increases, the model predicts further ahead. The further ahead that the model predicts, the more inaccurate those predictions will be. Also if N is large, then a lot more computations need to happen which can lead to inaccurate results from the solver or solver unable to provide the solution in real time. I found that N around 10-15 steps was the best.
 
@@ -84,9 +79,12 @@ Tuning of N and dt
 * dt - I tried dt values of 0.10, 0.12, 0.15 and 0.20. I found at 0.10 or below the car oscillated around the center of the track. And at 0.20 while the motion was smooth, the car rolled off the edge of the track around the curve. The best performance was at dt = 0.12.
 * N - Once dt was locked, I tried very high N - 30 and motion of the car was very jerky. The car was not very sensitive to N as long as it was in the range between 10 and 15. I finally chosen N =12.
 
-###3. Polynomial Fitting and MPC Preprocessing
+### 3. Polynomial Fitting and MPC Preprocessing
 
 The x and y coordinates received from the simulator were in the map space. They were converted to vehicle space in main.cpp line 104. Once the coordinates were in the vehicle space, a 3rd degree polynomial was fit to them and then used to calculate CTE. 
+
+### 4. Dealing with latency
+The simulator has been setup to have a latency of 0.1 s. This means that the actuator inputs sent to the simulator execute with a delay of 0.1 s. I found that the best approach to dealing with latency is to explicitely account for it in the MPC model. I incorporated latency in the MPC state before passing it to the solver - see MPC.cpp line 175. As a result the solution from the solver - steering and throttle better account for the current state of the vehicle. Also I found that having dt > latency ensured smooth motion in the simulator.
 
 ## Dependencies
 
