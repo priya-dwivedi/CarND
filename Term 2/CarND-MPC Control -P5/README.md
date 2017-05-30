@@ -62,11 +62,11 @@ As described in the lectures, the following are the steps for executing MPC
         Explained above
 
 Once all the model is set and all the parameters are defined, 
-    1. We pass the current state as the initial state to the model predictive controller.
+1. We pass the current state as the initial state to the model predictive controller.
 
-    2. We call the optimization solver. Given the initial state, the solver will return the vector of control inputs that minimizes the cost function. The solver we'll use is called Ipopt.
-    3. We apply the first control input to the vehicle.
-    and  Back to 1.
+2. We call the optimization solver. Given the initial state, the solver will return the vector of control inputs that minimizes the cost function. The solver we'll use is called Ipopt.
+3. We apply the first control input to the vehicle.
+ and  Back to 1.
 
 
 ### 2. Timestep Length and Frequency
