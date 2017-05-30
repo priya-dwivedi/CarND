@@ -4,15 +4,15 @@ Self-Driving Car Engineer Nanodegree Program
 ---
 ## Reflections on the project
 
-1. The Model
+### 1. The Model
 
-State
+**State**
 The MPC model defines state in terms of x , y positions, ψ - orientation of the car and v- velocity of the car, cte - the cross track error and epsi - the orientation error. The variables x, y, ψ and v are received from the simulator. The x, y position are in the map coordinates and are converted into the vehicle coordinate system. The vehicle space is used for fitting polynomials and path planning for the car. 
 
-Actuators
+**Actuators**
 There are two actuators here: δ - steering angle and a- throttle (which also includes negative acceleration - braking). These are obtained from the result of the solver and passed to the simulator (in main.cpp lines 141-146)
 
-Update equations
+**Update equations**
 The new state is obtained from the previous state by applying the kinematic model equations as described in the lectures. These equations were implemented in MPC.cpp staring line 134. 
 
     x = x + v*cos(ψ)* dt
@@ -21,7 +21,7 @@ The new state is obtained from the previous state by applying the kinematic mode
         a in [-1,1]
     ψ=ψ+(v/L_f)*δ∗dt
 
-Error calculation 
+**Error calculation** 
 The key to solving MPC equation is to define the error properly. This required a fair bit of tuning. This is the error that solver tries to minimize. 
 
 As suggested in the lectures, the error included several components:
