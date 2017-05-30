@@ -2,6 +2,51 @@
 Self-Driving Car Engineer Nanodegree Program
 
 ---
+## Reflections on the project
+
+1. The Model
+
+State
+The MPC model defines state in terms of x , y positions, ψ - orientation of the car and v- velocity of the car, cte - the cross track error and epsi - the orientation error. The variables x, y, ψ and v are received from the simulator. The x, y position are in the map coordinates and are converted into the vehicle coordinate system. The vehicle space is used for fitting polynomials and path planning for the car. 
+
+Actuators
+There are two actuators here: δ - steering angle and a- throttle (which also includes negative acceleration - braking). These are obtained from the result of the solver and passed to the simulator (in main.cpp lines 141-146)
+
+Update equations
+The new state is obtained from the previous state by applying the kinematic model equations as described in the lectures. These equations were implemented in MPC.cpp staring line 134. 
+
+    x = x + v*cos(ψ)* dt
+    y = y + v sin(psi) dt
+    v=v+a∗dt
+        a in [-1,1]
+    ψ=ψ+(v/L_f)*δ∗dt
+
+Error calculation 
+The key to solving MPC equation is to define the error properly. This required a fair bit of tuning. This is the error that solver tries to minimize. 
+
+As suggested in the lectures, the error included several components:
+
+ for (int i = 0; i < N; i++) {
+      fg[0] += cost_cte* CppAD::pow(vars[cte_start + i] - ref_cte, 2);
+      fg[0] += cost_eps* CppAD::pow(vars[epsi_start + i] - ref_epsi, 2);
+      fg[0] += cost_v* CppAD::pow(vars[v_start + i] - ref_v, 2);
+    }
+Above the error varies by deviation from reference CTE (set to zero), reference epsi (set to zero) and ref velocity (set to 40). N is the no. of timesteps we are forecasting into the future. The errors were all multiplied by factors (cost_cte, cost_eps etc) which were very important for smooth driving in the simulator and these multipliers were tuned by trying various values
+
+The error also varied by the actuator values and the change in actuator from previous time step. This ensures smooth changes in actuator values. Again the multipliers associated with them were tuned by looking at performance in the simulator. 
+
+for (int i = 0; i < N - 1; i++) {
+      fg[0] += cost_current_delta*CppAD::pow(vars[delta_start + i], 2);
+      fg[0] += cost_current_a*CppAD::pow(vars[a_start + i], 2);
+    }
+
+    // Minimize the value gap between sequential actuations.
+    for (int i = 0; i < N - 2; i++) {
+      fg[0] += cost_diff_delta* CppAD::pow(vars[delta_start + i + 1] - vars[delta_start + i], 2);
+      fg[0] += cost_diff_a*CppAD::pow(vars[a_start + i + 1] - vars[a_start + i], 2);
+  
+    }
+The full code is in MPC.cpp lines 65 -87. 
 
 ## Dependencies
 
