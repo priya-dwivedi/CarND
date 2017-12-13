@@ -274,6 +274,7 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
 
 	  x_ = x;
 	  P_ = P;
+	  }
 
 
 	//Update LIDAR measurements
@@ -452,5 +453,4 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
 		}
 	}
 	   
-}
 }
